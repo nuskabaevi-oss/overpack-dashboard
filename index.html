@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OVERPACK Cloud Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">OVERPACK <span class="text-indigo-500 text-lg">Cloud</span></h1>
+            <p class="text-slate-400">г. Актобе • <span id="current-time"></span></p>
+        </div>
+        <div class="flex items-center gap-3 glass-card p-2 rounded-xl">
+            <div class="bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium">Founder</p>
+                <p class="text-xs text-slate-400">Админ-панель</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-slate-400 text-sm mb-1">Выручка за сегодня</p>
+            <h2 class="text-3xl font-bold">125 400 <span class="text-sm font-normal">₸</span></h2>
+            <div class="mt-4 flex gap-2 text-xs">
+                <span class="text-emerald-400"><i class="fas fa-arrow-up"></i> 12%</span>
+                <span class="text-slate-500 text-xxs">к вчерашнему дню</span>
+            </div>
+        </div>
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-slate-400 text-sm mb-1">Способы оплаты</p>
+            <div class="space-y-2 mt-2">
+                <div class="flex justify-between text-sm">
+                    <span>🔴 Kaspi</span>
+                    <span class="font-bold">85 000 ₸</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span>💵 Наличные</span>
+                    <span class="font-bold">40 400 ₸</span>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-slate-400 text-sm mb-1">Общий долг</p>
+            <h2 class="text-3xl font-bold text-rose-500">42 000 <span class="text-sm font-normal">₸</span></h2>
+            <p class="text-xs text-slate-500 mt-2">6 активных должников</p>
+        </div>
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-slate-400 text-sm mb-1">Средний чек</p>
+            <h2 class="text-3xl font-bold text-indigo-400">8 360 <span class="text-sm font-normal">₸</span></h2>
+            <p class="text-xs text-slate-500 mt-2">На основе 15 чеков</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 glass-card p-6 rounded-2xl">
+            <h3 class="text-lg font-bold mb-6">Активность заведения (11:00 - 03:00)</h3>
+            <div class="h-64">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl">
+            <h3 class="text-lg font-bold mb-4">Низкий остаток <span class="text-xs bg-rose-500/20 text-rose-500 px-2 py-1 rounded-md ml-2">Внимание</span></h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="text-sm font-medium">MustHave Pinkman</p>
+                        <p class="text-xs text-slate-500">Tobacco</p>
+                    </div>
+                    <span class="text-rose-500 font-bold">1 шт.</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="text-sm font-medium">Уголь Crown 25мм</p>
+                        <p class="text-xs text-slate-500">Coal</p>
+                    </div>
+                    <span class="text-rose-500 font-bold">2 шт.</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="text-sm font-medium">Burn Black Cherry</p>
+                        <p class="text-xs text-slate-500">Tobacco</p>
+                    </div>
+                    <span class="text-amber-500 font-bold">4 шт.</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 py-3 bg-indigo-600/20 text-indigo-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all text-sm font-bold">
+                СФОРМИРОВАТЬ ЗАКУП
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Время в реальном времени
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleString('ru-RU');
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // График продаж (Mock Data)
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00', '02:00'],
+                datasets: [{
+                    label: 'Сумма продаж (₸)',
+                    data: [12000, 18000, 15000, 35000, 52000, 89000, 110000, 45000],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#6366f1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
