@@ -3,145 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OVERPACK Cloud Dashboard</title>
+    <title>OVERPACK Cloud | Founder Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050505; color: #f8fafc; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05); }
+        .pin-btn { width: 75px; height: 75px; background: #111; border: 1px solid #222; border-radius: 50%; font-size: 1.5rem; transition: 0.2s; }
+        .pin-btn:active { background: #6366f1; transform: scale(0.9); }
+        .branch-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .branch-btn.active { background: #6366f1; color: white; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+        #app-content { display: none; }
+        .pulse-green { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 2s infinite; }
+        @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="overflow-x-hidden">
 
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight">OVERPACK <span class="text-indigo-500 text-lg">Cloud</span></h1>
-            <p class="text-slate-400">г. Актобе • <span id="current-time"></span></p>
+    <div id="lock-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050505]">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold tracking-tighter mb-2">OVERPACK<span class="text-indigo-500 italic">.</span></h1>
+            <p class="text-slate-600 uppercase tracking-[0.3em] text-[10px] font-bold">Secure Cloud Dashboard</p>
         </div>
-        <div class="flex items-center gap-3 glass-card p-2 rounded-xl">
-            <div class="bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center">
-                <i class="fas fa-user-tie"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium">Founder</p>
-                <p class="text-xs text-slate-400">Админ-панель</p>
-            </div>
+        <div id="pin-dots" class="flex gap-5 mb-12">
+            <div class="w-4 h-4 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-4 h-4 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-4 h-4 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-4 h-4 rounded-full border-2 border-slate-800 transition-all"></div>
         </div>
-    </header>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="glass-card p-6 rounded-2xl">
-            <p class="text-slate-400 text-sm mb-1">Выручка за сегодня</p>
-            <h2 class="text-3xl font-bold">125 400 <span class="text-sm font-normal">₸</span></h2>
-            <div class="mt-4 flex gap-2 text-xs">
-                <span class="text-emerald-400"><i class="fas fa-arrow-up"></i> 12%</span>
-                <span class="text-slate-500 text-xxs">к вчерашнему дню</span>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-2xl">
-            <p class="text-slate-400 text-sm mb-1">Способы оплаты</p>
-            <div class="space-y-2 mt-2">
-                <div class="flex justify-between text-sm">
-                    <span>🔴 Kaspi</span>
-                    <span class="font-bold">85 000 ₸</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span>💵 Наличные</span>
-                    <span class="font-bold">40 400 ₸</span>
-                </div>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-2xl">
-            <p class="text-slate-400 text-sm mb-1">Общий долг</p>
-            <h2 class="text-3xl font-bold text-rose-500">42 000 <span class="text-sm font-normal">₸</span></h2>
-            <p class="text-xs text-slate-500 mt-2">6 активных должников</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl">
-            <p class="text-slate-400 text-sm mb-1">Средний чек</p>
-            <h2 class="text-3xl font-bold text-indigo-400">8 360 <span class="text-sm font-normal">₸</span></h2>
-            <p class="text-xs text-slate-500 mt-2">На основе 15 чеков</p>
+        <div class="grid grid-cols-3 gap-6">
+            <button class="pin-btn" onclick="addNum('1')">1</button>
+            <button class="pin-btn" onclick="addNum('2')">2</button>
+            <button class="pin-btn" onclick="addNum('3')">3</button>
+            <button class="pin-btn" onclick="addNum('4')">4</button>
+            <button class="pin-btn" onclick="addNum('5')">5</button>
+            <button class="pin-btn" onclick="addNum('6')">6</button>
+            <button class="pin-btn" onclick="addNum('7')">7</button>
+            <button class="pin-btn" onclick="addNum('8')">8</button>
+            <button class="pin-btn" onclick="addNum('9')">9</button>
+            <button class="text-rose-500 font-bold" onclick="clearPin()">CLEAR</button>
+            <button class="pin-btn" onclick="addNum('0')">0</button>
+            <button class="text-emerald-500 font-bold" onclick="validatePin()">ENTER</button>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div id="app-content" class="min-h-screen p-4 md:p-8 max-w-7xl mx-auto">
         
-        <div class="lg:col-span-2 glass-card p-6 rounded-2xl">
-            <h3 class="text-lg font-bold mb-6">Активность заведения (11:00 - 03:00)</h3>
-            <div class="h-64">
-                <canvas id="salesChart"></canvas>
+        <div class="flex flex-col md:flex-row gap-4 mb-10">
+            <button id="btn-shop" onclick="switchBranch('shop')" class="branch-btn active flex-1 glass p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <i class="fas fa-store text-xl"></i>
+                </div>
+                <div class="text-left">
+                    <p class="font-bold">SHOP</p>
+                    <p class="text-[10px] opacity-60">Бр. Жубановых 292/1</p>
+                </div>
+            </button>
+            <button id="btn-lounge" onclick="switchBranch('lounge')" class="branch-btn flex-1 glass p-4 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400">
+                    <i class="fas fa-couch text-xl"></i>
+                </div>
+                <div class="text-left">
+                    <p class="font-bold">SHOP x LOUNGE</p>
+                    <p class="text-[10px] opacity-60">А. Молдагуловой 3</p>
+                </div>
+            </button>
+        </div>
+
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h2 id="branch-title" class="text-3xl font-extrabold mb-1">OVERPACK SHOP</h2>
+                <div class="flex items-center gap-3">
+                    <span id="status-badge" class="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">
+                        <span class="status-dot w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-green"></span> ОТКРЫТО
+                    </span>
+                    <p id="branch-hours" class="text-slate-500 text-xs">До 23:00</p>
+                </div>
+            </div>
+            <div class="text-right hidden md:block">
+                <p class="text-slate-500 text-xs uppercase tracking-tighter">Текущее время</p>
+                <p id="live-clock" class="text-xl font-bold">18:45:00</p>
             </div>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-lg font-bold mb-4">Низкий остаток <span class="text-xs bg-rose-500/20 text-rose-500 px-2 py-1 rounded-md ml-2">Внимание</span></h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="text-sm font-medium">MustHave Pinkman</p>
-                        <p class="text-xs text-slate-500">Tobacco</p>
-                    </div>
-                    <span class="text-rose-500 font-bold">1 шт.</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-3xl relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 opacity-5 text-6xl italic font-black">CASH</div>
+                <p class="text-slate-500 text-xs font-bold uppercase mb-2">Выручка сегодня</p>
+                <h3 id="stat-revenue" class="text-3xl font-black italic tracking-tighter">125 400 ₸</h3>
+                <p class="text-[10px] text-emerald-400 mt-2 font-bold"><i class="fas fa-arrow-trend-up"></i> +12.4% к вчера</p>
+            </div>
+            
+            <div class="glass p-6 rounded-3xl">
+                <p class="text-slate-500 text-xs font-bold uppercase mb-4">Типы оплаты</p>
+                <div class="flex items-end gap-2 h-16">
+                    <div id="bar-kaspi" class="bg-rose-500 rounded-t-lg flex-1 transition-all duration-1000" style="height: 70%"></div>
+                    <div id="bar-cash" class="bg-emerald-500 rounded-t-lg flex-1 transition-all duration-1000" style="height: 30%"></div>
                 </div>
-                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="text-sm font-medium">Уголь Crown 25мм</p>
-                        <p class="text-xs text-slate-500">Coal</p>
-                    </div>
-                    <span class="text-rose-500 font-bold">2 шт.</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="text-sm font-medium">Burn Black Cherry</p>
-                        <p class="text-xs text-slate-500">Tobacco</p>
-                    </div>
-                    <span class="text-amber-500 font-bold">4 шт.</span>
+                <div class="flex justify-between mt-2 text-[10px] font-bold">
+                    <span class="text-rose-400">KASPI QR</span>
+                    <span class="text-emerald-400">НАЛИЧНЫЕ</span>
                 </div>
             </div>
-            <button class="w-full mt-6 py-3 bg-indigo-600/20 text-indigo-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all text-sm font-bold">
-                СФОРМИРОВАТЬ ЗАКУП
-            </button>
+
+            <div class="glass p-6 rounded-3xl">
+                <p class="text-slate-500 text-xs font-bold uppercase mb-2">Цель по продажам</p>
+                <div class="flex justify-between items-end mb-2">
+                    <span id="goal-percent" class="text-2xl font-black tracking-tighter">62%</span>
+                    <span class="text-[10px] text-slate-500">План: 200к</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="goal-bar" class="bg-indigo-500 h-full transition-all duration-1000" style="width: 62%"></div>
+                </div>
+            </div>
+
+            <div class="glass p-6 rounded-3xl border-indigo-500/20">
+                <p class="text-slate-500 text-xs font-bold uppercase mb-2">Контроль доставки</p>
+                <div class="flex items-center gap-3 mt-1">
+                    <i class="fas fa-truck text-indigo-400 text-2xl"></i>
+                    <div>
+                        <p class="text-xs font-bold">Бесплатно от 10к</p>
+                        <p class="text-[9px] text-slate-500 leading-none">Акция активна в Актобе</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="lg:col-span-1 glass p-6 rounded-3xl">
+                <h3 class="text-sm font-bold uppercase tracking-widest mb-6">Топ за смену</h3>
+                <div id="top-products" class="space-y-4">
+                    </div>
+            </div>
+
+            <div class="lg:col-span-2 glass p-6 rounded-3xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-sm font-bold uppercase tracking-widest">Умная лента событий</h3>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">A</div>
+                        <span class="text-xs font-bold">Арман на смене</span>
+                    </div>
+                </div>
+                <div id="event-logs" class="space-y-5">
+                    </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Время в реальном времени
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('current-time').innerText = now.toLocaleString('ru-RU');
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+        let currentPin = "";
+        const ADMIN_PIN = "0000";
+        let activeBranch = "shop";
 
-        // График продаж (Mock Data)
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00', '02:00'],
-                datasets: [{
-                    label: 'Сумма продаж (₸)',
-                    data: [12000, 18000, 15000, 35000, 52000, 89000, 110000, 45000],
-                    borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#6366f1'
-                }]
+        const branchesData = {
+            shop: {
+                title: "OVERPACK SHOP",
+                address: "Бр. Жубановых 292/1",
+                hours: "До 23:00",
+                limit: 23,
+                revenue: "125 400 ₸",
+                goal: 62,
+                kaspi: 70,
+                cash: 30,
+                products: [
+                    { name: "MustHave Pinkman", qty: 12, trend: "up" },
+                    { name: "Darkside Shot", qty: 8, trend: "down" },
+                    { name: "Уголь Crown 25", qty: 5, trend: "up" }
+                ],
+                logs: [
+                    { type: "sale", msg: "Продано: 12 500 ₸", time: "5 мин назад", color: "emerald" },
+                    { type: "warning", msg: "Позиция удалена из чека!", time: "12 мин назад", color: "rose" },
+                    { type: "user", msg: "Новый клиент: Дамир", time: "25 мин назад", color: "indigo" }
+                ]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                }
+            lounge: {
+                title: "OVERPACK LOUNGE",
+                address: "А. Молдагуловой 3",
+                hours: "До 03:00",
+                limit: 3,
+                revenue: "210 800 ₸",
+                goal: 70,
+                kaspi: 45,
+                cash: 55,
+                products: [
+                    { name: "Кальян Classic", qty: 24, trend: "up" },
+                    { name: "Чай Цитрусовый", qty: 15, trend: "up" },
+                    { name: "MustHave Apple", qty: 9, trend: "down" }
+                ],
+                logs: [
+                    { type: "sale", msg: "Столик №5 закрыт: 18 000 ₸", time: "1 мин назад", color: "emerald" },
+                    { type: "sale", msg: "Добавлен предзаказ", time: "10 мин назад", color: "indigo" },
+                    { type: "sale", msg: "Бронь: Стол №1 (20:00)", time: "40 мин назад", color: "emerald" }
+                ]
             }
-        });
+        };
+
+        function addNum(n) {
+            if (currentPin.length < 4) {
+                currentPin += n;
+                updateDots();
+            }
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('#pin-dots div');
+            dots.forEach((dot, i) => {
+                if (i < currentPin.length) {
+                    dot.style.background = "#6366f1";
+                    dot.style.borderColor = "#6366f1";
+                    dot.style.transform = "scale(1.2)";
+                } else {
+                    dot.style.background = "transparent";
+                    dot.style.borderColor = "#1e293b";
+                    dot.style.transform = "scale(1)";
+                }
+            });
+        }
+
+        function clearPin() { currentPin = ""; updateDots(); }
+
+        function validatePin() {
+            if (currentPin === ADMIN_PIN) {
+                document.getElementById('lock-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'block';
+                    renderData();
+                }, 300);
+            } else {
+                alert("ACCESS DENIED");
+                clearPin();
+            }
+        }
+
+        function switchBranch(branch) {
+            activeBranch = branch;
+            document.querySelectorAll('.branch-btn').forEach(b => {
+                b.classList.remove('active');
+                b.querySelector('div').classList.replace('bg-indigo-500/20', 'bg-slate-800');
+                b.querySelector('div').classList.replace('text-indigo-400', 'text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById('btn-' + branch);
+            activeBtn.classList.add('active');
+            activeBtn.querySelector('div').classList.replace('bg-slate-800', 'bg-indigo-500/20');
+            activeBtn.querySelector('div').classList.replace('text-slate-400', 'text-indigo-400');
+            
+            renderData();
+        }
+
+        function renderData() {
+            const data = branchesData[activeBranch];
+            document.getElementById('branch-title').innerText = data.title;
+            document.getElementById('branch-hours').innerText = data.hours;
+            document.getElementById('stat-revenue').innerText = data.revenue;
+            document.getElementById('goal-percent').innerText = data.goal + "%";
+            document.getElementById('goal-bar').style.width = data.goal + "%";
+            document.getElementById('bar-kaspi').style.height = data.kaspi + "%";
+            document.getElementById('bar-cash').style.height = data.cash + "%";
+
+            // Рендер товаров
+            document.getElementById('top-products').innerHTML = data.products.map((p, i) => `
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-black text-slate-700">${i+1}</span>
+                        <span class="text-sm font-bold">${p.name}</span>
+                    </div>
+                    <span class="text-xs font-black px-2 py-1 bg-slate-900 rounded-lg">${p.qty} шт</span>
+                </div>
+            `).join('');
+
+            // Рендер логов
+            document.getElementById('event-logs').innerHTML = data.logs.map(log => `
+                <div class="flex gap-4">
+                    <div class="w-1 bg-${log.color}-500 rounded-full"></div>
+                    <div>
+                        <p class="text-sm font-bold">${log.msg}</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-black">${log.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clock() {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+        }
+        setInterval(clock, 1000);
     </script>
 </body>
 </html>
